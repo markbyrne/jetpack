@@ -1,10 +1,8 @@
 <?php
 /**
- * Jetpack Search: Jetpack_Search_Helpers class
+ * Helper class providing various static utility functions for use in Search.
  *
- * @package    Jetpack
- * @subpackage Jetpack Search
- * @since      5.8.0
+ * @package    automattic/jetpack-search
  */
 
 namespace Automattic\Jetpack\Search;

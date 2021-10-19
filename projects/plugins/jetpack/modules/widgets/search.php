@@ -13,8 +13,13 @@ use Automattic\Jetpack\Search\Options as Jetpack_Search_Options;
 use Automattic\Jetpack\Status;
 use Automattic\Jetpack\Tracking;
 
+require_once JETPACK__PLUGIN_DIR . 'modules/search/class-jetpack-search-template-tags.php';
+
 add_action( 'widgets_init', 'jetpack_search_widget_init' );
 
+/**
+ * Registers the Jetpack Search widget if supported by the site's curent plan.
+ */
 function jetpack_search_widget_init() {
 	if (
 		! Jetpack::is_connection_ready()
@@ -318,10 +323,10 @@ class Jetpack_Search_Widget extends WP_Widget {
 
 		if ( is_search() ) {
 			if ( Jetpack_Search_Helpers::should_rerun_search_in_customizer_preview() ) {
-				Jetpack_Search::instance()->update_search_results_aggregations();
+				Automattic\Jetpack\Search\Classic_Search::instance()->update_search_results_aggregations();
 			}
 
-			$filters = Jetpack_Search::instance()->get_filters();
+			$filters = Automattic\Jetpack\Search\Classic_Search::instance()->get_filters();
 
 			if ( ! Jetpack_Search_Helpers::are_filters_by_widget_disabled() && ! $this->should_display_sitewide_filters() ) {
 				$filters = array_filter( $filters, array( $this, 'is_for_current_widget' ) );
@@ -422,10 +427,10 @@ class Jetpack_Search_Widget extends WP_Widget {
 	 */
 	public function widget_instant( $args, $instance ) {
 		if ( Jetpack_Search_Helpers::should_rerun_search_in_customizer_preview() ) {
-			Jetpack_Search::instance()->update_search_results_aggregations();
+			Automattic\Jetpack\Search\Instant_Search::instance()->update_search_results_aggregations();
 		}
 
-		$filters = Jetpack_Search::instance()->get_filters();
+		$filters = Automattic\Jetpack\Search\Instant_Search::instance()->get_filters();
 		if ( ! Jetpack_Search_Helpers::are_filters_by_widget_disabled() && ! $this->should_display_sitewide_filters() ) {
 			$filters = array_filter( $filters, array( $this, 'is_for_current_widget' ) );
 		}
