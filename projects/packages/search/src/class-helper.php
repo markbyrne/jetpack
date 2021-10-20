@@ -902,4 +902,26 @@ class Helper {
 		</div>
 		<?php
 	}
+
+	/**
+	 * Gets all of the active plugins via site options.
+	 * Forked from Jetpack::get_active_plugins from the Jetpack plugin.
+	 *
+	 * @return string[]
+	 */
+	public static function get_active_plugins() {
+		// active_plugins plugins as values.
+		$active_plugins = (array) get_option( 'active_plugins', array() );
+
+		// active_sitewide_plugins stores plugins as keys.
+		if ( is_multisite() ) {
+			$network_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
+			if ( $network_plugins ) {
+				$active_plugins = array_merge( $active_plugins, $network_plugins );
+			}
+		}
+
+		sort( $active_plugins );
+		return array_unique( $active_plugins );
+	}
 }
