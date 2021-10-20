@@ -1,9 +1,8 @@
 <?php
 /**
- * Jetpack Search: Instant Front-End Search and Filtering
+ * Instant Search: Our modern and customizable search experience.
  *
- * @since 8.3.0
- * @package automattic/jetpack
+ * @package automattic/jetpack-search
  */
 
 namespace Automattic\Jetpack\Search;
@@ -13,9 +12,7 @@ use Jetpack_WPES_Query_Builder;
 use WP_Error;
 
 /**
- * Class to load Instant Search experience on the site.
- *
- * @since 8.3.0
+ * Class responsible for enabling the Instant Search experience on the site.
  */
 class Instant_Search extends Classic_Search {
 	/**

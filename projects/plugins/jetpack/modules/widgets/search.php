@@ -1,6 +1,6 @@
 <?php
 /**
- * Jetpack Search: Jetpack_Search_Widget class
+ * The Jetpack Search widget, which supports both Classic and Instant Search variants.
  *
  * @package    Jetpack
  * @subpackage Jetpack Search
@@ -32,10 +32,9 @@ function jetpack_search_widget_init() {
 }
 
 /**
- * Provides a widget to show available/selected filters on searches.
+ * Defines the Jetpack Search widget.
  *
  * @since 5.0.0
- *
  * @see   WP_Widget
  */
 class Jetpack_Search_Widget extends WP_Widget {

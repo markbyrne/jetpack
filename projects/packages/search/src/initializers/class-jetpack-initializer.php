@@ -13,7 +13,7 @@ namespace Automattic\Jetpack\Search;
  */
 class Jetpack_Initializer extends Initializer {
 	/**
-	 * Initializes Instant or Classic Search experiences.
+	 * Initializes either the Classic Search or the Instant Search experience.
 	 */
 	public static function initialize() {
 		// TODO: Port the search widget to package.
