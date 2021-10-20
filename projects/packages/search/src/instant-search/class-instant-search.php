@@ -8,7 +8,7 @@
 namespace Automattic\Jetpack\Search;
 
 use Automattic\Jetpack\Search;
-use Jetpack_WPES_Query_Builder;
+use Automattic\Jetpack\Search\WPES\Query_Builder as Jetpack_WPES_Query_Builder;
 use WP_Error;
 
 /**
@@ -550,13 +550,12 @@ class Instant_Search extends Classic_Search {
 	 * @since  9.6.0
 	 */
 	public function auto_config_woo_result_format() {
-		if ( ! method_exists( 'Jetpack', 'get_active_plugins' ) ) {
-			return false;
-		}
-
-		// TODO: Replace Jetpack:: invocation.
 		// Check if WooCommerce plugin is active (based on https://docs.woocommerce.com/document/create-a-plugin/).
-		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', \Jetpack::get_active_plugins() ), true ) ) {
+		if ( ! in_array(
+			'woocommerce/woocommerce.php',
+			apply_filters( 'active_plugins', Search\Helper::get_active_plugins() ),
+			true
+		) ) {
 			return false;
 		}
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Classic Search: The legacy search experience.
+ * Classic Search: Our original search experience with filtering capability.
  *
  * @package    @automattic/jetpack-search
  */
@@ -9,23 +9,21 @@ namespace Automattic\Jetpack\Search;
 
 use Automattic\Jetpack\Connection\Client;
 use Automattic\Jetpack\Search\Helper as Jetpack_Search_Helpers;
-// TODO: Replace usage of WPES libraries here by migrating them to the package.
-use Jetpack_WPES_Query_Builder;
-use Jetpack_WPES_Search_Query_Parser;
+use Automattic\Jetpack\Search\WPES\Query_Builder as Jetpack_WPES_Query_Builder;
+use Automattic\Jetpack\Search\WPES\Query_Parser as Jetpack_WPES_Search_Query_Parser;
 use WP_Error;
 use WP_Query;
 use WP_Tax_Query;
 
 /**
- * The legacy search experience that's used when instant search is disabled.
+ * Class responsible for enabling the Classic Search experience on the site.
  */
 class Classic_Search {
 	/**
 	 * The singleton instance of this class.
 	 *
 	 * @since 5.0.0
-	 *
-	 * @var Jetpack_Search
+	 * @var Classic_Search
 	 */
 	protected static $instance;
 
@@ -33,7 +31,6 @@ class Classic_Search {
 	 * The number of found posts.
 	 *
 	 * @since 5.0.0
-	 *
 	 * @var int
 	 */
 	protected $found_posts = 0;
@@ -42,7 +39,6 @@ class Classic_Search {
 	 * The search result, as returned by the WordPress.com REST API.
 	 *
 	 * @since 5.0.0
-	 *
 	 * @var array
 	 */
 	protected $search_result;
@@ -51,7 +47,6 @@ class Classic_Search {
 	 * This site's blog ID on WordPress.com.
 	 *
 	 * @since 5.0.0
-	 *
 	 * @var int
 	 */
 	protected $jetpack_blog_id;
@@ -60,7 +55,6 @@ class Classic_Search {
 	 * The Elasticsearch aggregations (filters).
 	 *
 	 * @since 5.0.0
-	 *
 	 * @var array
 	 */
 	protected $aggregations = array();
@@ -69,7 +63,6 @@ class Classic_Search {
 	 * The maximum number of aggregations allowed.
 	 *
 	 * @since 5.0.0
-	 *
 	 * @var int
 	 */
 	protected $max_aggregations_count = 100;
@@ -78,7 +71,6 @@ class Classic_Search {
 	 * Statistics about the last Elasticsearch query.
 	 *
 	 * @since 5.6.0
-	 *
 	 * @var array
 	 */
 	protected $last_query_info = array();
@@ -87,7 +79,6 @@ class Classic_Search {
 	 * Statistics about the last Elasticsearch query failure.
 	 *
 	 * @since 5.6.0
-	 *
 	 * @var array
 	 */
 	protected $last_query_failure_info = array();
@@ -96,7 +87,6 @@ class Classic_Search {
 	 * Languages with custom analyzers. Other languages are supported, but are analyzed with the default analyzer.
 	 *
 	 * @since 5.0.0
-	 *
 	 * @var array
 	 */
 	public static $analyzed_langs = array( 'ar', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'eu', 'fa', 'fi', 'fr', 'he', 'hi', 'hu', 'hy', 'id', 'it', 'ja', 'ko', 'nl', 'no', 'pt', 'ro', 'ru', 'sv', 'tr', 'zh' );
@@ -110,12 +100,13 @@ class Classic_Search {
 	/**
 	 * Returns the singleton of the class. Instantiates and sets up a singleton instance if necessary.
 	 *
+	 * @param string $blog_id Blog id.
 	 * @return static The class singleton.
 	 */
-	public static function instance() {
+	public static function instance( $blog_id ) {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new static();
-			self::$instance->setup();
+			self::$instance->setup( $blog_id );
 		}
 
 		return self::$instance;
@@ -123,31 +114,15 @@ class Classic_Search {
 
 	/**
 	 * Performs setup tasks for the singleton. To be used exclusively after singleton instantitaion.
+	 *
+	 * @param string $blog_id Blog id.
 	 */
-	public function setup() {
-		// TODO: Replace Jetpack:: invocation.
-		if ( ! \Jetpack::is_connection_ready() || ! $this->is_search_supported() ) {
-			/**
-			 * Fires when the Jetpack Search fails and would fallback to MySQL.
-			 *
-			 * @module search
-			 * @since 7.9.0
-			 *
-			 * @param string $reason Reason for Search fallback.
-			 * @param mixed  $data   Data associated with the request, such as attempted search parameters.
-			 */
-			do_action( 'jetpack_search_abort', 'inactive', null );
+	public function setup( $blog_id ) {
+		if ( ! $blog_id ) {
 			return;
 		}
 
-		// TODO: Replace Jetpack:: invocation.
-		$this->jetpack_blog_id = \Jetpack::get_option( 'id' );
-
-		if ( ! $this->jetpack_blog_id ) {
-			do_action( 'jetpack_search_abort', 'no_blog_id', null );
-			return;
-		}
-
+		$this->jetpack_blog_id = $blog_id;
 		$this->init_hooks();
 	}
 
@@ -191,20 +166,6 @@ class Classic_Search {
 		}
 
 		add_action( 'jetpack_deactivate_module_search', array( $this, 'move_search_widgets_to_inactive' ) );
-	}
-
-	/**
-	 * Is search supported on the current plan
-	 *
-	 * @since 6.0
-	 * Loads scripts for Tracks analytics library
-	 */
-	public function is_search_supported() {
-		// TODO: Replace Jetpack_Plan:: invocation.
-		if ( method_exists( 'Jetpack_Plan', 'supports' ) ) {
-			return \Jetpack_Plan::supports( 'search' );
-		}
-		return false;
 	}
 
 	/**
