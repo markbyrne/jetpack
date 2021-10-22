@@ -694,6 +694,7 @@ class Helper {
 	 * @return bool
 	 */
 	public static function is_valid_locale( $locale ) {
+		// TODO: Replace JETPACK__GLOTPRESS_LOCALES_PATH.
 		if ( ! class_exists( 'GP_Locales' ) ) {
 			if ( defined( 'JETPACK__GLOTPRESS_LOCALES_PATH' ) && file_exists( JETPACK__GLOTPRESS_LOCALES_PATH ) ) {
 				require JETPACK__GLOTPRESS_LOCALES_PATH;
@@ -713,6 +714,8 @@ class Helper {
 	 * @return string $script_version Version number.
 	 */
 	public static function get_asset_version( $file ) {
+		// TODO: Replace Jetpack:: invocation.
+		// TODO: Replace JETPACK__PLUGIN_DIR and JETPACK__VERSION.
 		return Jetpack::is_development_version() && file_exists( JETPACK__PLUGIN_DIR . $file )
 			? filemtime( JETPACK__PLUGIN_DIR . $file )
 			: JETPACK__VERSION;
@@ -862,7 +865,7 @@ class Helper {
 			'postsPerPage'          => $posts_per_page,
 			'siteId'                => class_exists( 'Jetpack' ) && method_exists( 'Jetpack', 'get_option' ) ? Jetpack::get_option( 'id' ) : get_current_blog_id(),
 			'postTypes'             => $post_type_labels,
-			'webpackPublicPath'     => plugins_url( '_inc/build/instant-search/', JETPACK__PLUGIN_FILE ),
+			'webpackPublicPath'     => plugins_url( '/', __DIR__ . '/build' ),
 			'isPhotonEnabled'       => ( $is_wpcom || $is_jetpack_photon_enabled ) && ! $is_private_site,
 
 			// config values related to private site support.
