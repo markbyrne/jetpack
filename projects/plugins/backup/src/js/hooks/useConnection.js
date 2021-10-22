@@ -76,6 +76,7 @@ export default function useConnection() {
 				connectedPlugins={ connectedPlugins }
 				onDisconnected={ onDisconnectedCallback }
 				redirectUri="admin.php?page=jetpack-backup"
+				assetBaseUrl={ assetBuildUrl }
 			/>
 		);
 	};
